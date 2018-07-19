@@ -1,13 +1,16 @@
 #!/bin/bash
 
-g++ -o prg "$1.cpp" -std=c++17 -Ofast -DONLINE_JUDGE || exit
+target=$1
+corr=$2
+checker=$3
+gen=$4
 
 for ((i = 0; i < 100; i++))
 do
-	tst=`./gen`
-	a=`echo $tst | ./prg | python3 check.py`
-	b=`echo $tst | ./main | python3 check.py`
-	if [ "$a" != "$b" ] 
+	tst=`$gen`
+	a=`echo $tst | $target`
+	b=`echo $tst | $corr`
+	if [ `$checker "$a" "$b" "$tst"` != "OK" ] 
 	then
 		echo "<a href=http://codeforces.com/contest/$2/challenge/$1>$1</a><br>" >> res.html
 		tst=`echo "$tst" | python3 -c "from sys import stdin, stdout;stdout.write(stdin.read().replace('\n', '<br>'))"`

@@ -70,7 +70,7 @@ def run():
 		if not q.empty():
 			code, lang = q.get()
 			target = get_executable(code, lang)
-			os.system('./test.sh ' + target + ' ' + checker + ' ' + correct_solution + ' ' + test_gen)
+			os.system('./test.sh ' + target + ' ' + correct_solution + ' ' + checker + ' ' + test_gen)
 			q.task_done()
 
 def start(correct_solution_, checker_, test_gen_):
