@@ -51,17 +51,17 @@ def get_list(n):
 			ans.append(x, s[p + ind])
 	return ans
 
-def get_executable(code, lang):
+def get_executable(code, lang, prefix = ''):
 	with open('/tmp/code.' + lang, 'w') as f:
 		f.write(code)
 	if (lang == 'cpp'):
-		os.system('g++ -std=c++17 -DONLINE_JUDGE -o /tmp/main /tmp/code.cpp 12> /dev/null')
-		return '/tmp/main'
+		os.system('g++ -std=c++17 -DONLINE_JUDGE -o /tmp/' + prefix + 'main /tmp/' + prefix + 'code.cpp 12> /dev/null')
+		return '/tmp/' + prefix + 'main'
 	elif (lang == 'pas'):
-		os.system('fpc /tmp/code.pas 12> /dev/null')
-		return '/tmp/code'
+		os.system('fpc /tmp/' + prefix + 'code.pas 12> /dev/null')
+		return '/tmp/' + prefix + 'code'
 	else:
-		return '"' + lang + ' /tmp/code.' + lang + '"'
+		return '"' + lang + ' /tmp/' + prefix + 'code.' + lang + '"'
 
 def run():
 	while True:
@@ -80,7 +80,7 @@ def start(correct_solution_, checker_, test_gen_):
 	global correct_solution
 	global checker
 	checker = checker_
-	correct_solution = get_executable(*get_code(correct_solution_))
+	correct_solution = get_executable(*get_code(correct_solution_), 'corr_')
 	test_gen = test_gen_
 	runed = True
 	main_thread.start()
