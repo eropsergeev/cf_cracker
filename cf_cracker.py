@@ -48,32 +48,34 @@ def get_list(n):
 		p = s.find(x)
 		if (s[p:p + 1000].count('submissionVerdict="OK"') != 0 and s[p:p + 1000].count('/contest/' + contest_number + '/problem/') != 0):
 			ind = s[p:p + 1000].find('/contest/' + contest_number + '/problem/') + len('/contest/' + contest_number + '/problem/')
-			ans.append(x, s[p + ind])
+			ans.append((x, s[p + ind]))
 	return ans
 
 def get_executable(code, lang, prefix = ''):
-	with open('/tmp/code.' + lang, 'w') as f:
+	with open('/tmp/' + prefix + 'code.' + lang, 'w') as f:
 		f.write(code)
 	if (lang == 'cpp'):
-		os.system('g++ -std=c++17 -DONLINE_JUDGE -o /tmp/' + prefix + 'main /tmp/' + prefix + 'code.cpp 12> /dev/null')
+		os.system('g++ -std=c++17 -DONLINE_JUDGE -o /tmp/' + prefix + 'main /tmp/' + prefix + 'code.cpp > /dev/null')
 		return '/tmp/' + prefix + 'main'
 	elif (lang == 'pas'):
-		os.system('fpc /tmp/' + prefix + 'code.pas 12> /dev/null')
+		os.system('fpc /tmp/' + prefix + 'code.pas > /dev/null')
 		return '/tmp/' + prefix + 'code'
 	else:
 		return '"' + lang + ' /tmp/' + prefix + 'code.' + lang + '"'
 
 def run():
+	global runed
 	while True:
 		if not runed:
 			return
 		if not q.empty():
-			code, lang = q.get()
+			code, lang, problem = q.get()
 			target = get_executable(code, lang)
-			os.system('./test.sh ' + target + ' ' + correct_solution + ' ' + checker + ' ' + test_gen)
+			os.system('./test.sh ' + target + ' ' + correct_solution + ' ' + checker + ' ' + test_gen + ' ' + problem + ' ' + contest_number)
 			q.task_done()
 
 def start(correct_solution_, checker_, test_gen_):
+	global runed
 	if (runed):
 		return
 	global test_gen
@@ -86,15 +88,31 @@ def start(correct_solution_, checker_, test_gen_):
 	main_thread.start()
 
 def stop():
+	global runed
+	global main_thread
 	if not runed:
 		return
 	runed = False
 	main_thread.join()
+	main_thread = Thread(target=run)
+
+class MyQueue(Queue):
+	def __init__(self):
+		self.sz = 0
+		super().__init__()
+	def put(self, x):
+		self.sz += 1
+		super().put(x)
+	def get(self):
+		self.sz -= 1
+		return super().get()
+	def size(self):
+		return self.sz;
 
 
 if __name__ == "__main__":
 	submitions_list = []
-	q = Queue()
+	q = MyQueue()
 	runed = False
 	main_thread = Thread(target=run)
 	while (True):
@@ -108,6 +126,7 @@ if __name__ == "__main__":
 			print('code <X> - get source codes for problem X and put it to queue')
 			print('start <correct_solution> <checker> <test_gen> - start testing')
 			print('stop - stop testing')
+			print('size - queue size')
 		elif (command == 'contest' and len(args) >= 1):
 			contest_number = args[0]
 		elif (command == 'list' and len(args) >= 2):
@@ -126,8 +145,10 @@ if __name__ == "__main__":
 				if (problem == args[0]):
 					code = get_code(num)
 					if (code):
-						q.put(code)
+						q.put(code + (num,))
 		elif (command == 'start'):
-			start(*args)
+			start(*' '.join(args).split('#'))
+		elif (command== 'size'):
+			print(q.size())
 		else:
 			print("command not found")

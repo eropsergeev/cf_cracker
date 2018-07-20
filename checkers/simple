@@ -1,0 +1,10 @@
+#!/usr/bin/python3
+
+from sys import *
+
+a = argv[1].replace('\n', ' ').split()
+b = argv[2].replace('\n', ' ').split()
+if (len(argv) < 3 or a != b):
+	print("NOT")
+else:
+	print("OK")
