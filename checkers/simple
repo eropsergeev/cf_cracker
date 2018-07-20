@@ -2,8 +2,8 @@
 
 from sys import *
 
-a = argv[1].replace('\n', ' ').split()
-b = argv[2].replace('\n', ' ').split()
+a = argv[1].replace('\n', ' ').strip().split()
+b = argv[2].replace('\n', ' ').strip().split()
 if (len(argv) < 3 or a != b):
 	print("NOT")
 else:

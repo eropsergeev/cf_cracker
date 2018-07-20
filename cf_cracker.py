@@ -6,6 +6,7 @@ from tqdm import tqdm
 from queue import Queue
 import os
 from threading import *
+from time import sleep
 
 problem = ''
 contest_number = argv[1] if len(argv) > 1 else '1006'
@@ -74,16 +75,10 @@ def run():
 			os.system('./test.sh ' + target + ' ' + correct_solution + ' ' + checker + ' ' + test_gen + ' ' + problem + ' ' + contest_number)
 			q.task_done()
 
-def start(correct_solution_, checker_, test_gen_):
+def start():
 	global runed
 	if (runed):
 		return
-	global test_gen
-	global correct_solution
-	global checker
-	checker = checker_
-	correct_solution = get_executable(*get_code(correct_solution_), 'corr_')
-	test_gen = test_gen_
 	runed = True
 	main_thread.start()
 
@@ -116,17 +111,27 @@ if __name__ == "__main__":
 	runed = False
 	main_thread = Thread(target=run)
 	while (True):
-		args = input().split()
+		try:
+			args = input().split()
+		except:
+			continue
+		if not(len(args)):
+			continue
 		command = args[0]
+		if (command[0] == '#'):
+			continue
 		args = args[1:]
 		if (command == 'help'):
 			print('contest <X> - set contest number')
 			print('list <from> <to> - generate submitions list')
 			print('clear <list|queue> - clear submissions list or queue')
 			print('code <X> - get source codes for problem X and put it to queue')
-			print('start <correct_solution> <checker> <test_gen> - start testing')
+			print('set <correct_solution|checker|test_gen> <value> - no coments')
+			print('start - start testing')
 			print('stop - stop testing')
 			print('size - queue size')
+			print('exit - exit')
+			print('wait <n> - wait n seconds')
 		elif (command == 'contest' and len(args) >= 1):
 			contest_number = args[0]
 		elif (command == 'list' and len(args) >= 2):
@@ -147,8 +152,23 @@ if __name__ == "__main__":
 					if (code):
 						q.put(code + (num,))
 		elif (command == 'start'):
-			start(*' '.join(args).split('#'))
+			start()
 		elif (command== 'size'):
 			print(q.size())
+		elif (command == 'set'):
+			if (args[0] == 'correct_solution'):
+				try:
+					correct_solution = get_executable(*get_code(args[1]), 'corr_')
+				except:
+					print("error!")
+			elif (args[0] == 'checker'):
+				checker = ' '.join(args[1:])
+			elif (args[0] == 'test_gen'):
+				test_gen = ' '.join(args[1:])
+		elif (command == 'exit'):
+			stop()
+			exit()
+		elif (command == 'wait' and len(args) >= 1):
+			sleep(int(args[0]))
 		else:
 			print("command not found")
