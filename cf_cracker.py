@@ -126,14 +126,13 @@ if __name__ == "__main__":
 			print('list <from> <to> - generate submitions list')
 			print('clear <list|queue> - clear submissions list or queue')
 			print('code <X> - get source codes for problem X and put it to queue')
-			print('set <correct_solution|checker|test_gen> <value> - no coments')
+			print('set <correct_solution|checker|test_gen|contest> <value> - no coments')
 			print('start - start testing')
 			print('stop - stop testing')
 			print('size - queue size')
 			print('exit - exit')
 			print('wait <n> - wait n seconds')
-		elif (command == 'contest' and len(args) >= 1):
-			contest_number = args[0]
+			print('show <checker|test_gen|contest> - no comments')
 		elif (command == 'list' and len(args) >= 2):
 			for i in tqdm(range(int(args[0]), int(args[1]))):
 				submitions_list += get_list(i)
@@ -165,6 +164,15 @@ if __name__ == "__main__":
 				checker = ' '.join(args[1:])
 			elif (args[0] == 'test_gen'):
 				test_gen = ' '.join(args[1:])
+			elif (args[0] == 'contest'):
+				contest_number = args[1]
+		elif (command == 'show'):
+			elif (args[0] == 'checker'):
+				print(checker)
+			elif (args[0] == 'test_gen'):
+				print(test_gen)
+			elif (args[0] == 'contest'):
+				print(contest_number)
 		elif (command == 'exit'):
 			stop()
 			exit()
